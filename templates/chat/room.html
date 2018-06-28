@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block user_url %}
+    {% url 'userprofile' username %}
+{% endblock user_url %}
+
+{% block user %}
+    {{ username }}
+{% endblock user %}
+
+{% block login %}
+    <form method="POST" action="/logout/">
+        <input type="submit" class="btn btn-danger navbar-btn navbar-right" value="退出登录"/>
+        <input type="hidden" name="username" value={{ username }}>
+        {% csrf_token %}
+    </form>
+{% endblock login %}
+
+{% block room %}
+    <div class="col-xs-3 col-sm-3 col-md-3">
+        <div class="alert alert-success" role="alert" style="margin-top: 15px; margin-bottom: -15px">当前在线</div>
+        <div id="room-list">
+            <ul class="list-group" style="margin-top: 15px">
+                {% for user in users_online %}
+                    {% if user.username == username %}
+                    {% else %}
+                        <li class="list-group-item">
+                            <a href="{% url 'friendprofile' username user.username %}"
+                               class="list-group-item">{{ user.username }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <div class="alert alert-success" role="alert" style="margin-top: 15px; margin-bottom: -15px">当前离线</div>
+            <div id="room-list">
+                <ul class="list-group" style="margin-top: 15px">
+                    {% for user in users_offline %}
+                        {% if user.username == username %}
+                        {% else %}
+                            <li class="list-group-item">
+                                <a href="{% url 'friendprofile' username user.username %}"
+                                   class="list-group-item">{{ user.username }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-xs-9 col-md-9 col-sm-9" style="margin-top: 15px; padding-right: 0px">
+        <div id="room" style="height: 450px">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    聊天室：{{ roomname }}
+                </div>
+                <div class="panel-body" style="height: 350px; padding: 0px; ">
+                        <textarea id="chat-log" style="height: 100%; width: 100%; border-color: #f5f5f5;">
+
+                        </textarea>
+
+                </div>
+                <div class="panel-footer" style="padding: 0px">
+                    <input id="chat-message-input" type="text"
+                           style="width: 100%; height: 120px; border: #f5f5f5; border-top-color: #dff0d8; "/>
+                    <div class="col-md-offset-11">
+                        <input id="chat-message-submit" class="btn btn-primary" type="button" value="发送"
+                               style="margin-top: 10px;margin-bottom: 10px; "/>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock room %}
+
+
+{% block script %}
+    <script>
+        var roomName = {{ room_name_json }};
+        var userName = {{ user_name_json }};
+
+        var chatSocket = new WebSocket(
+            'ws://' + window.location.host +
+            '/ws/chat/' + roomName + '/' + userName + '/');
+
+        chatSocket.onmessage = function (e) {
+            var data = JSON.parse(e.data);
+            var message = data['message'];
+            document.querySelector('#chat-log').value += (message + '\n');
+        };
+
+        chatSocket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function (e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function (e) {
+            var messageInputDom = document.querySelector('#chat-message-input');
+            var message = userName + ':\t' + messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+
+            messageInputDom.value = '';
+        };
+    </script>
+{% endblock script %}

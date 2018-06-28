@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block user_url %}
+    {% url 'userprofile' user_obj.username %}
+{% endblock user_url %}
+
+{% block user %}
+    {{ user_obj.username }}
+{% endblock user %}
+
+{% block back2chat_url %}
+    {% url 'back2chat' user_obj.username %}
+{% endblock back2chat_url %}
+
+{% block login %}
+    <form method="POST" action="/logout/">
+        <input type="submit" class="btn btn-danger navbar-btn navbar-right" value="退出登录"/>
+        <input type="hidden" name="username" value={{ user_obj.username }}>
+        {% csrf_token %}
+    </form>
+{% endblock login %}
+
+{% block room %}
+    <div class="col-xs-3 col-sm-3 col-md-3">
+        <div class="alert alert-success" role="alert" style="margin-top: 15px; margin-bottom: -15px">当前在线</div>
+        <div id="room-list">
+            <ul class="list-group" style="margin-top: 15px">
+                {% for user in users_online %}
+                    {% if user.username == user_obj.username %}
+                    {% else %}
+                        <li class="list-group-item">
+                            <a href="{% url 'friendprofile' user_obj.username user.username %}"
+                               class="list-group-item">{{ user.username }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="alert alert-success" role="alert" style="margin-top: 15px; margin-bottom: -15px">当前离线</div>
+        <div id="room-list">
+            <ul class="list-group" style="margin-top: 15px">
+                {% for user in users_offline %}
+                    <li class="list-group-item">
+                        <a href="{% url 'friendprofile' user_obj.username user.username %}"
+                           class="list-group-item">{{ user.username }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-xs-9 col-md-9 col-sm-9" style="margin-top: 15px; padding-right: 0px">
+        <div id="room" style="height: 500px">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    用户信息
+                </div>
+                <div class="panel-body" style="height: 500px; padding: 0px; ">
+                    <div class="col-md-8 col-md-offset-2" style="margin-top: 100px">
+                        <form id="form" class="form-horizontal" action="{% url 'userprofile' user_obj.username %}"
+                              method="post">
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label"></label>
+                                <div class="input-group col-sm-8">
+                                    <span class="input-group-addon"><i class="fa fa-user-plus fa-fw"></i>昵称</span>
+                                    <label class="form-control">{{ user_obj.username }}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label"></label>
+                                <div class="input-group col-sm-8">
+                                    <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i>邮箱</span>
+                                    <label class="form-control">{{ user_obj.email }}</label>
+                                    <input name="email" type="hidden" value="{{ user_obj.email }}"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPassword3" class="col-sm-2 control-label"></label>
+                                <div class="input-group col-sm-8">
+                                    <span class="input-group-addon"><i class="fa fa-key fa-fw"></i>修改密码</span>
+                                    <input type="password" name="re_pwd" id="re_pwd" class="form-control"
+                                           id="inputPassword3"
+                                           placeholder="Password">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPassword3" class="col-sm-2 control-label"></label>
+                                <div class="input-group col-sm-8">
+                                    <span class="input-group-addon"><i class="fa fa-key fa-fw"></i>确认密码</span>
+                                    <input type="password" name="re_pwd_2" id="re_pwd_2" class="form-control"
+                                           id="inputPassword3"
+                                           placeholder="Password">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group col-sm-offset-2 col-sm-8">
+                                    <button type="submit" class="btn btn-primary btn-block"
+                                            onclick="return insertManager()">提交
+                                    </button>
+                                </div>
+
+                                <p class="text-danger text-center" style="font-size: 16px">{{ message }}</p>
+                            </div>
+                            {% csrf_token %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock room %}

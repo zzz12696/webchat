@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block user_url %}
+    {% url 'userprofile' username %}
+{% endblock user_url %}
+
+{% block user %}
+    {{ username }}
+{% endblock user %}
+
+{% block login %}
+    <form method="POST" action="/logout/">
+        <input type="submit" class="btn btn-danger navbar-btn navbar-right" value="退出登录"/>
+        <input type="hidden" name="username" value={{ username }}>
+        {% csrf_token %}
+    </form>
+{% endblock login %}
+
+
+{% block room %}
+    <div class="col-xs-3 col-sm-3 col-md-3">
+        <div class="alert alert-success" role="alert" style="margin-top: 15px; margin-bottom: -15px">当前在线</div>
+        <div id="room-list">
+            <ul class="list-group" style="margin-top: 15px">
+                {% for user in users_online %}
+                    {% if user.username == username %}
+                    {% else %}
+                        <li class="list-group-item">
+                            <a href="{% url 'friendprofile' username user.username %}"
+                               class="list-group-item">{{ user.username }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="alert alert-success" role="alert" style="margin-top: 15px; margin-bottom: -15px">当前离线</div>
+        <div id="room-list">
+            <ul class="list-group" style="margin-top: 15px">
+                {% for user in users_offline %}
+                    {% if user.username == username %}
+                    {% else %}
+                        <li class="list-group-item">
+                            <a href="{% url 'friendprofile' username user.username %}"
+                               class="list-group-item">{{ user.username }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-xs-9 col-md-9 col-sm-9" style="margin-top: 15px; padding-right: 0px">
+    <div id="room" style="height: 450px">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                Panel content
+            </div>
+            <div class="panel-body" style="height: 500px; padding: 0px; ">
+                <div class="col-md-4 col-md-offset-4" style="margin-top: 100px">
+                    <h1 class="text-center">请输入房间号</h1>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input id="room-name-input" type="text" class="form-control" placeholder="房间号...">
+                                <span class="input-group-btn">
+        <input id="room-name-submit" class="btn btn-default" type="button" value="Go!"/>
+      </span>
+                                <input id="username" type="hidden" value="{{ username }}"/>
+                            </div><!-- /input-group -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock room %}
+
+{% block chatface %}
+{% endblock chatface %}
+
+{% block script %}
+    <script>
+        document.querySelector('#room-name-input').focus();
+        document.querySelector('#room-name-input').onkeyup = function (e) {
+            if (e.keyCode === 13) {  // enter松开, 触发按钮click事件
+                document.querySelector('#room-name-submit').click();
+            }
+        };
+
+        document.querySelector('#room-name-submit').onclick = function (e) {
+            var roomName = document.querySelector('#room-name-input').value;
+            var username = document.querySelector('#username').value;
+            window.location.pathname = '/chat/' + roomName + '/' + username + '/';
+        };
+        //修改pathname，则浏览器中的地址栏url的pathname部分就会改变，并触发新的http get操作
+    </script>
+{% endblock script %}

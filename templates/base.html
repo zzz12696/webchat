@@ -1,0 +1,65 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>webchat</title>
+
+    <link rel="shortcut icon" href="/static/img/webchat.ico" type="image/x-icon"/>
+
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/fontawesome/css/font-awesome.min.css">
+</head>
+
+
+<body style="background-image: url(/static/img/webchat.jpg); background-attachment:fixed; background-position:center; background-size:100% 100%; ">
+<div class="container" style="height: 650px; margin-top: 50px; padding: 0px; background-color: #f5f5f5; ">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% block user_url %}{% endblock user_url %}">
+                    {% block user %}{% endblock user %}</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">webchat 实时聊天系统<span class="sr-only">(current)</span></a></li>
+                    <li><a href="{% block back2chat_url %}{% endblock back2chat_url %}">chat</a></li>
+                </ul>
+                {% block login %}
+                {% endblock login %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container row" style="margin-top: -20px">
+        {% block room %}
+        {% endblock room %}
+    </div>
+
+
+</div>
+<div class="container">
+    <div style="margin-bottom: 10px; margin-top: 20px; text-align: center; font-size: 16px; color: #e3e3e3;">Designed by
+        <a href="https://github.com/zzz12696" style="color: #e3e3e3;" target="_blank">muzicm.cn</a>
+    </div>
+</div>
+
+
+{% block script %}
+{% endblock script %}
+
+<script src="/static/jquery-3.3.1.js"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
